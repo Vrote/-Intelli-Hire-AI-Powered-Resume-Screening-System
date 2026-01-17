@@ -30,6 +30,17 @@ Algorithms Used:
 3. TF-IDF + Cosine Similarity
    Measures semantic similarity between resumes and job descriptions.
    Avoids false negatives caused by different wording.
+   
+
+Setup & Installation:
+
+Prerequisites:<br>
+Python, Supabase account, Google Gemini API key<br><br>
+Environment Variables (.env):<br>
+SUPABASE_URL=your_supabase_url<br>
+SUPABASE_KEY=your_supabase_anon_key<br>
+GEMINI_API_KEY=your_gemini_api_key<br><br>
+Install Dependencies:pip install -r requirements.txt, Run Application:, python app.py
 
 
 System Architecture:
