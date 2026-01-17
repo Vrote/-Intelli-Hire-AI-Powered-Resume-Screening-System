@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelli-Hire - AI Resume Screening</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .candidate-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+            margin-bottom: 25px;
+        }
+        
+        .candidate-name-section h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .contact-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #666;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .candidate-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .type-fresher {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .type-experienced {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border: 2px solid #17a2b8;
+        }
+
+        .type-recent {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .overall-score-badge {
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .score-high {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+        
+        .score-medium {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+        
+        .score-low {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+        
+        .profile-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .profile-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .education-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .education-list li {
+            padding: 10px 15px;
+            background: white;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .graduation-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid #28a745;
+            margin-top: 10px;
+        }
+
+        .graduation-info strong {
+            color: #28a745;
+        }
+        
+        .skills-analysis {
+            margin: 25px 0;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .skill-box {
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .skill-box.matched {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .skill-box.missing {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .skill-box h4 {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .skill-tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .skill-tag.matched {
+            background: #28a745;
+            color: white;
+        }
+        
+        .skill-tag.missing {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .match-table-container {
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .match-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .match-table th,
+        .match-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .match-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .match-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .algorithm-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .algo-pattern {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .algo-string {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .algo-similarity {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .score-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .score-card h4 {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        
+        .score-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+        
+        .ai-analysis {
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .ai-analysis h3 {
+            color: #1565c0;
+            margin-bottom: 12px;
+        }
+        
+        .strengths-weaknesses {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .strength-box, .weakness-box {
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .strength-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .weakness-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .strength-box h4, .weakness-box h4 {
+            margin-bottom: 12px;
+        }
+        
+        .strength-box ul, .weakness-box ul {
+            margin-left: 20px;
+        }
+        
+        .strength-box li, .weakness-box li {
+            margin: 8px 0;
+        }
+        
+        .recommendation-section {
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .recommendation-section.highly-recommended {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+        }
+        
+        .recommendation-section.recommended {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            border: 2px solid #17a2b8;
+        }
+        
+        .recommendation-section.maybe {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffc107;
+        }
+        
+        .recommendation-section.not-recommended {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border: 2px solid #dc3545;
+        }
+        
+        .recommendation-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .questions-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .questions-section h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .questions-section ol {
+            margin-left: 20px;
+        }
+        
+        .questions-section li {
+            margin: 12px 0;
+            font-size: 1rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress {
+            text-align: center;
+            padding: 40px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .tech-footer {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f0f4ff;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .candidate-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .skills-grid,
+            .strengths-weaknesses {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Intelli-Hire</h1>
+            <p>AI-Powered Resume Screening & Analysis</p>
+            <div>
+                <span class="tech-badge">🤖 RAG Analysis</span>
+                <span class="tech-badge">🧠 Smart Matching</span>
+                <span class="tech-badge">🎓 Fresher Detection</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('create')">Create Job</button>
+            <button class="tab" onclick="showTab('analyze')">AI Analysis</button>
+            <button class="tab" onclick="showTab('results')">Results</button>
+        </div>
+
+        <div id="create-tab" class="tab-content active">
+            <div class="card">
+                <h2>📝 Create Job Posting</h2>
+                <form id="job-form">
+                    <div class="form-group">
+                        <label>Job Title *</label>
+                        <input type="text" id="job-title" required placeholder="e.g., Senior ML Engineer">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Required Skills * (comma-separated)</label>
+                        <input type="text" id="required-skills" required 
+                            placeholder="e.g., Python, Machine Learning, AWS, Docker, React">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Experience Required</label>
+                        <input type="text" id="experience-required" 
+                            placeholder="e.g., 3-5 years in ML/AI or Fresh Graduates">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Job Description *</label>
+                        <textarea id="job-description" rows="8" required 
+                            placeholder="Enter detailed job requirements..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Create Job</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="analyze-tab" class="tab-content">
+            <div class="card">
+                <h2>🔬 AI-Powered Analysis</h2>
+                
+                <form id="analyze-form">
+                    <div class="form-group">
+                        <label>Select Job</label>
+                        <select id="job-select" required>
+                            <option value="">-- Select a Job --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Resumes (PDF/DOCX)</label>
+                        <input type="file" id="resume-files" multiple accept=".pdf,.docx" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">🚀 Start Analysis</button>
+                </form>
+                
+                <div id="analysis-progress" class="progress" style="display:none;">
+                    <div class="spinner"></div>
+                    <p>🤖 Running comprehensive AI analysis...</p>
+                </div>
+            </div>
+
+            <div id="analysis-results" style="display:none;">
+                <h2>📊 Analysis Results</h2>
+                <div id="results-container"></div>
+            </div>
+        </div>
+
+        <div id="results-tab" class="tab-content">
+            <div class="card">
+                <h2>📈 Candidate Rankings</h2>
+                <div class="form-group">
+                    <label>Select Job</label>
+                    <select id="results-job-select">
+                        <option value="">-- Select a Job --</option>
+                    </select>
+                </div>
+                <div id="candidates-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'analyze' || tabName === 'results') {
+                loadJobs();
+            }
+        }
+
+        async function loadJobs() {
+            try {
+                const res = await fetch('/api/jobs');
+                const data = await res.json();
+                
+                ['job-select', 'results-job-select'].forEach(id => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = '<option value="">-- Select a Job --</option>';
+                    data.jobs.forEach(job => {
+                        const option = document.createElement('option');
+                        option.value = job.id;
+                        option.textContent = job.title;
+                        select.appendChild(option);
+                    });
+                });
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        document.getElementById('job-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('job-title').value,
+                description: document.getElementById('job-description').value,
+                required_skills: document.getElementById('required-skills').value,
+                experience_required: document.getElementById('experience-required').value
+            };
+            
+            try {
+                const res = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    alert('✅ Job created successfully!');
+                    document.getElementById('job-form').reset();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+
+        document.getElementById('analyze-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const jobId = document.getElementById('job-select').value;
+            const files = document.getElementById('resume-files').files;
+            
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+            for (let file of files) {
+                formData.append('resumes', file);
+            }
+            
+            document.getElementById('analysis-progress').style.display = 'block';
+            document.getElementById('analysis-results').style.display = 'none';
+            
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                document.getElementById('analysis-progress').style.display = 'none';
+                
+                if (data.success) {
+                    displayResults(data.candidates);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (err) {
+                document.getElementById('analysis-progress').style.display = 'none';
+                alert('Error: ' + err.message);
+            }
+        });
+
+        function getCandidateTypeClass(candidateType) {
+            if (!candidateType) return 'type-experienced';
+            const type = candidateType.toLowerCase();
+            if (type.includes('fresher')) return 'type-fresher';
+            if (type.includes('recent')) return 'type-recent';
+            return 'type-experienced';
+        }
+
+        function displayResults(candidates) {
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+            
+            candidates.forEach((c, idx) => {
+                const scoreClass = c.overall_score >= 75 ? 'high' : 
+                                   c.overall_score >= 50 ? 'medium' : 'low';
+                
+                const recommendationClass = c.recommendation.toLowerCase().replace('_', '-');
+                const typeClass = getCandidateTypeClass(c.candidate_type);
+                
+                const card = document.createElement('div');
+                card.className = 'candidate-card';
+                card.innerHTML = `
+                    <div class="candidate-header">
+                        <div class="candidate-name-section">
+                            <h2>${idx + 1}. ${c.candidate_name || 'Unknown Candidate'}</h2>
+                            <div class="contact-info">
+                                ${c.email ? `<div class="contact-item">📧 ${c.email}</div>` : ''}
+                                ${c.phone ? `<div class="contact-item">📱 ${c.phone}</div>` : ''}
+                            </div>
+                            ${c.candidate_type ? `<span class="candidate-type-badge ${typeClass}">${c.candidate_type}</span>` : ''}
+                        </div>
+                        <div class="overall-score-badge score-${scoreClass}">
+                            ${c.overall_score}%
+                            <div style="font-size: 0.6rem; font-weight: normal;">Overall Score</div>
+                        </div>
+                    </div>
+
+                    ${c.education && c.education.length > 0 ? `
+                    <div class="profile-section">
+                        <h3>🎓 Education</h3>
+                        <ul class="education-list">
+                            ${c.education.map(edu => `<li>${edu}</li>`).join('')}
+                        </ul>
+                        ${c.graduation_year ? `
+                        <div class="graduation-info">
+                            <strong>🎯 Graduation Year:</strong> ${c.graduation_year}
+                            ${c.is_fresher ? '<span style="color: #28a745; font-weight: 600; margin-left: 10px;">✨ Fresh Graduate</span>' : ''}
+                        </div>
+                        ` : ''}
+                    </div>
+                    ` : ''}
+
+                    <div class="skills-analysis">
+                        <h3 style="color: #2c3e50; margin-bottom: 15px;">🎯 Skills Analysis</h3>
+                        
+                        <div class="skills-grid">
+                            <div class="skill-box matched">
+                                <h4>✅ Matched Skills (${c.matched_skills ? c.matched_skills.length : 0})</h4>
+                                <div class="skill-tags">
+                                    ${(c.matched_skills || []).map(s => 
+                                        `<span class="skill-tag matched">${s}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="skill-box missing">
+                                <h4>❌ Missing Skills (${c.missing_skills ? c.missing_skills.length : 0})</h4>
+                                <div class="skill-tags">
+                                    ${(c.missing_skills || []).map(s => 
+                                        `<span class="skill-tag missing">${s}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        ${c.match_details && c.match_details.length > 0 ? `
+                        <div class="match-table-container">
+                            <h4 style="margin: 20px 0 10px 0;">📋 Detailed Match Analysis</h4>
+                            <table class="match-table">
+                                <thead>
+                                    <tr>
+                                        <th>Required Skill</th>
+                                        <th>Found As</th>
+                                        <th>Similarity</th>
+                                        <th>Match Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${c.match_details.map(m => {
+                                        let algoClass = 'algo-similarity';
+                                        if (m.algorithm === 'Pattern Matching') algoClass = 'algo-pattern';
+                                        else if (m.algorithm === 'String Matching') algoClass = 'algo-string';
+                                        
+                                        return `
+                                        <tr>
+                                            <td><strong>${m.required}</strong></td>
+                                            <td>${m.found}</td>
+                                            <td>${m.similarity}%</td>
+                                            <td>
+                                                <span class="algorithm-badge ${algoClass}">
+                                                    ${m.algorithm}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    <h3 style="color: #2c3e50; margin: 25px 0 15px 0;">📊 Score Breakdown</h3>
+                    <div class="score-breakdown">
+                        <div class="score-card">
+                            <h4>Overall Score</h4>
+                            <div class="score-value">${c.overall_score}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${c.overall_score}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="score-card">
+                            <h4>Skills Match</h4>
+                            <div class="score-value">${c.skill_match_percentage || c.skill_match_score || 0}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${c.skill_match_percentage || c.skill_match_score || 0}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="score-card">
+                            <h4>Experience Match</h4>
+                            <div class="score-value">${c.experience_match_score || 0}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${c.experience_match_score || 0}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="score-card">
+                            <h4>Cultural Fit</h4>
+                            <div class="score-value">${c.cultural_fit_score || 0}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${c.cultural_fit_score || 0}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ai-analysis">
+                        <h3>🤖 AI Summary</h3>
+                        <p>${c.ai_summary || 'Analysis completed'}</p>
+                        ${c.detailed_analysis ? `<p style="margin-top: 10px;"><strong>Details:</strong> ${c.detailed_analysis}</p>` : ''}
+                    </div>
+
+                    <div class="strengths-weaknesses">
+                        <div class="strength-box">
+                            <h4>💪 Strengths</h4>
+                            <ul>
+                                ${(c.strengths || []).map(s => `<li>${s}</li>`).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="weakness-box">
+                            <h4>⚠️ Areas to Explore</h4>
+                            <ul>
+                                ${(c.weaknesses || []).map(w => `<li>${w}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="recommendation-section ${recommendationClass}">
+                        <h3>📋 Recommendation: ${c.recommendation?.replace('_', ' ')}</h3>
+                        <p>${c.reasoning || ''}</p>
+                    </div>
+
+                    ${c.suggested_questions && c.suggested_questions.length > 0 ? `
+                    <div class="questions-section">
+                        <h4>❓ Suggested Interview Questions</h4>
+                        <ol>
+                            ${c.suggested_questions.map(q => `<li>${q}</li>`).join('')}
+                        </ol>
+                    </div>
+                    ` : ''}
+
+                    <div class="tech-footer">
+                        <strong>Powered by:</strong> RAG (Retrieval-Augmented Generation) + Advanced Matching Algorithms
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            document.getElementById('analysis-results').style.display = 'block';
+        }
+
+        document.getElementById('results-job-select').addEventListener('change', async (e) => {
+            const jobId = e.target.value;
+            
+            if (!jobId) {
+                document.getElementById('candidates-list').innerHTML = '';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/candidates/${jobId}`);
+                const data = await res.json();
+                
+                if (data.success && data.candidates.length > 0) {
+                    const container = document.getElementById('candidates-list');
+                    container.innerHTML = '<div id="results-container"></div>';
+                    displayResults(data.candidates);
+                } else {
+                    document.getElementById('candidates-list').innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No candidates found for this job.</p>';
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', loadJobs);
+    </script>
+</body>
+</html>
