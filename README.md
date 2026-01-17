@@ -19,7 +19,7 @@ Batch resume analysis and automatic ranking.
 Persistent storage with Supabase (PostgreSQL).
 
 
-Algorithms Used (DAA Focus):
+Algorithms Used:
 
 1. Knuth-Morris-Pratt (KMP) Algorithm.
    Used for fast and efficient exact skill matching.
