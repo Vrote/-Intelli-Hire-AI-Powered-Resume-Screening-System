@@ -5,6 +5,7 @@ Overview:
 Intelli-Hire is an intelligent recruitment automation system that analyzes, scores, and ranks resumes against dynamic job requirements using DAA algorithms, NLP techniques, and Generative AI (RAG).
 Unlike traditional keyword-based ATS systems, Intelli-Hire applies semantic similarity, fuzzy matching, and fresher-aware scoring to ensure fair and accurate candidate evaluation.
 
+
 Key Features:
 
 Dynamic job creation with custom required skills.
@@ -17,6 +18,7 @@ Algorithmic fallback scoring (AI-independent).
 Batch resume analysis and automatic ranking.
 Persistent storage with Supabase (PostgreSQL).
 
+
 Algorithms Used (DAA Focus):
 
 1. Knuth-Morris-Pratt (KMP) Algorithm.
@@ -28,6 +30,7 @@ Algorithms Used (DAA Focus):
 3. TF-IDF + Cosine Similarity
    Measures semantic similarity between resumes and job descriptions.
    Avoids false negatives caused by different wording.
+
 
 System Architecture:
 
